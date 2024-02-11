@@ -1,3 +1,12 @@
 from django.shortcuts import render
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated
+from habit.models import Place
+from habit.serializers import PlaceSerializer
 
-# Create your views here.
+
+class PlaceCreateView(CreateAPIView):
+    queryset = Place.objects.all()
+    serializer_class = PlaceSerializer
+    permission_classes = [IsAuthenticated]
+
