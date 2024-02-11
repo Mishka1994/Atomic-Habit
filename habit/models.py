@@ -17,13 +17,13 @@ class Place(models.Model):
 
 class Habit(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь', related_name='user')
-    place = models.ForeignKey(Place, on_delete=models.PROTECT, verbose_name='Место', related_name='place')
+    place = models.ForeignKey(Place, on_delete=models.PROTECT, verbose_name='Место', related_name='place', **NULLABLE)
     time = models.TimeField(verbose_name='Время выполнения привычки')
     action = models.CharField(max_length=250, verbose_name='Действие')
-    sign_pleasant_habit = models.BooleanField(default=False, verbose_name='Признак приятной привычки')
-    associated_habit = models.ForeignKey('self', on_delete=models.PROTECT, verbose_name='Связанная привычка')
+    sign_pleasant_habit = models.BooleanField(default=False, verbose_name='Признак приятной привычки', **NULLABLE)
+    associated_habit = models.ForeignKey('self', on_delete=models.PROTECT, verbose_name='Связанная привычка', **NULLABLE)
     frequency_in_days = models.IntegerField(verbose_name='Периодичность', default=1)
-    reward = models.CharField(max_length=250, verbose_name='Вознаграждение')
+    reward = models.CharField(max_length=250, verbose_name='Вознаграждение', default='Нет награды')
     time_to_complete = models.TimeField(verbose_name='Время, потраченное на привычку')
     is_public = models.BooleanField(default=False, verbose_name='Признак публичности')
 
