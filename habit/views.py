@@ -1,6 +1,9 @@
 from django.shortcuts import render
+from rest_framework import serializers
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
 from habit.models import Place, Habit
 from habit.serializers import PlaceSerializer, HabitSerializer
 
@@ -15,3 +18,5 @@ class HabitCreateView(CreateAPIView):
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
     permission_classes = [IsAuthenticated]
+
+
