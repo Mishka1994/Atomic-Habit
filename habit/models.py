@@ -16,7 +16,7 @@ class Place(models.Model):
 
 
 class Habit(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь', related_name='user')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь', related_name='user', **NULLABLE)
     place = models.ForeignKey(Place, on_delete=models.PROTECT, verbose_name='Место', related_name='place', **NULLABLE)
     time = models.TimeField(verbose_name='Время выполнения привычки')
     action = models.CharField(max_length=250, verbose_name='Действие')
