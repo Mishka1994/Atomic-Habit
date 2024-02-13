@@ -11,8 +11,14 @@ class PlaceSerializer(serializers.ModelSerializer):
 
 
 class HabitSerializer(serializers.ModelSerializer):
-    frequency_in_days = serializers.IntegerField(validators=[FrequencyHabitExecution(),])
-    time_to_complete = serializers.TimeField(validators=[DurationHabit(),])
+    class Meta:
+        model = Habit
+        fields = '__all__'
+
+
+class HabitCreateSerializer(serializers.ModelSerializer):
+    frequency_in_days = serializers.IntegerField(validators=[FrequencyHabitExecution(), ])
+    time_to_complete = serializers.TimeField(validators=[DurationHabit(), ])
 
     class Meta:
         model = Habit
@@ -29,8 +35,40 @@ class HabitSerializer(serializers.ModelSerializer):
 
         elif not validated_data['sign_pleasant_habit'] and validated_data.get('associated_habit') is not None:
             # Проверка на указание награды, при указанной связанной привычке
-            if len(validated_data['reward']) != 'Нет награды':
+            if validated_data.get('reward'):
                 raise serializers.ValidationError('Если указана связанная привычка, награду указывать нельзя!')
 
         habit_item = Habit.objects.create(**validated_data)
         return habit_item
+
+
+class HabitUpdateSerializer(serializers.ModelSerializer):
+    frequency_in_days = serializers.IntegerField(validators=[FrequencyHabitExecution(), ])
+    time_to_complete = serializers.TimeField(validators=[DurationHabit(), ])
+
+    class Meta:
+        model = Habit
+        fields = '__all__'
+
+    def update(self, instance, validated_data):
+        if instance.sign_pleasant_habit:
+            if validated_data.get('reward'):
+                raise serializers.ValidationError('У приятной привычки нельзя указывать награду!')
+            elif validated_data.get('associated_habit'):
+                raise serializers.ValidationError('У приятной привычки не может быть связанной привычки!')
+        elif not instance.reward and validated_data.associated_habit is not None:
+            if validated_data.get('reward'):
+                raise serializers.ValidationError('Если указана связанная привычка, награду указывать нельзя!')
+
+        instance.place = validated_data.get('place', instance.place)
+        instance.user = validated_data.get('user', instance.user)
+        instance.time = validated_data.get('time', instance.time)
+        instance.action = validated_data.get('action', instance.action)
+        instance.sign_pleasant_habit = validated_data.get('sign_pleasant_habit', instance.sign_pleasant_habit)
+        instance.associated_habit = validated_data.get('associated_habit', instance.associated_habit)
+        instance.frequency_in_days = validated_data.get('frequency_in_days', instance.frequency_in_days)
+        instance.reward = validated_data.get('reward', instance.reward)
+        instance.time_to_complete = validated_data.get('time_to_complete', instance.time_to_complete)
+        instance.is_public = validated_data.get('is_public', instance.is_public)
+
+        return instance
