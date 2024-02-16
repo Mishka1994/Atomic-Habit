@@ -6,6 +6,7 @@ from habit.models import Place, Habit
 from habit.paginators import HabitPaginator
 from habit.permissions import IsOwner
 from habit.serializers import PlaceSerializer, HabitCreateSerializer, HabitUpdateSerializer, HabitSerializer
+from habit.services import create_schedule_set
 
 
 class PlaceCreateView(CreateAPIView):
@@ -22,6 +23,7 @@ class HabitCreateView(CreateAPIView):
     def perform_create(self, serializer):
         new_habit = serializer.save()
         new_habit.user = self.request.user
+        create_schedule_set(new_habit)
         new_habit.save()
 
 
