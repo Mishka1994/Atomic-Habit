@@ -25,6 +25,7 @@ class HabitCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
+        # Валидация приятной привычки
         if validated_data['sign_pleasant_habit']:
             # Проверка на наличие связанной привычки у приятной привычки
             if validated_data.get('associated_habit') is not None:
@@ -33,10 +34,17 @@ class HabitCreateSerializer(serializers.ModelSerializer):
             elif validated_data.get('reward'):
                 raise serializers.ValidationError('У приятной привычки нельзя указывать награду!')
 
-        elif not validated_data['sign_pleasant_habit'] and validated_data.get('associated_habit') is not None:
-            # Проверка на указание награды, при указанной связанной привычке
-            if validated_data.get('reward'):
-                raise serializers.ValidationError('Если указана связанная привычка, награду указывать нельзя!')
+        # Валидация полезной привычки
+        elif not validated_data['sign_pleasant_habit']:
+            # Проверка на указанный вид привычки(может быть только приятная)
+            if validated_data.get('associated_habit'):
+                associated_habit = validated_data['associated_habit']
+                if not associated_habit.sign_pleasant_habit:
+                    raise serializers.ValidationError('В связанные привычки можно указывать только приятные привычки!')
+
+                # Проверка на одновременное указание награды и связанной привычки
+                elif validated_data.get('reward') and validated_data.get('associated_habit'):
+                    raise serializers.ValidationError('Нельзя указывать награду и связанную привычку одновременно!')
 
         habit_item = Habit.objects.create(**validated_data)
         return habit_item
@@ -56,7 +64,7 @@ class HabitUpdateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('У приятной привычки нельзя указывать награду!')
             elif validated_data.get('associated_habit'):
                 raise serializers.ValidationError('У приятной привычки не может быть связанной привычки!')
-        elif not instance.reward and validated_data.associated_habit is not None:
+        elif not instance.sign_pleasant_habit and validated_data.get('associated_habit') is not None:
             if validated_data.get('reward'):
                 raise serializers.ValidationError('Если указана связанная привычка, награду указывать нельзя!')
 
