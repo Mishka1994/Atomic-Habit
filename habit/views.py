@@ -23,7 +23,7 @@ class HabitCreateView(CreateAPIView):
     def perform_create(self, serializer):
         new_habit = serializer.save()
         new_habit.user = self.request.user
-        create_schedule_set(new_habit)
+        #create_schedule_set(new_habit)
         new_habit.save()
 
 
