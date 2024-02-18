@@ -22,7 +22,7 @@ habit/permissions.py                                                            
 habit/serializers.py                                                                  62      1    98%
 habit/services.py                                                                      7      1    86%
 habit/tasks.py                                                                         9      9     0%
-habit/tests.py                                                                       107      0   100%
+habit/tests.py                                                                       111      0   100%
 habit/urls.py                                                                          5      0   100%
 habit/validators.py                                                                   11      0   100%
 habit/views.py                                                                        39      0   100%
@@ -42,4 +42,4 @@ users/tests.py                                                                  
 users/urls.py                                                                          6      0   100%
 users/views.py                                                                        12      0   100%
 ------------------------------------------------------------------------------------------------------
-TOTAL                                                                                451     30    93%
+TOTAL                                                                                455     30    93%
