@@ -485,3 +485,49 @@ class HabitTestCase(APITestCase):
             response.status_code,
             status.HTTP_400_BAD_REQUEST
         )
+
+    def test_list_users_habit(self):
+        self.nice_habit = Habit.objects.create(
+            user=self.user,
+            place=self.place,
+            time='10:00:00',
+            action='Слушать музыку',
+            sign_pleasant_habit=True,
+            frequency_in_days=1,
+            time_to_complete='00:01:00'
+        )
+
+        response = self.client.get(
+            reverse('habit:habit-list')
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+    def test_list_public_habit(self):
+        self.nice_habit = Habit.objects.create(
+            user=self.user,
+            place=self.place,
+            time='10:00:00',
+            action='Слушать музыку',
+            sign_pleasant_habit=True,
+            frequency_in_days=1,
+            time_to_complete='00:01:00',
+            is_public=False
+        )
+
+        response = self.client.get(
+            reverse('habit:public_habit-list')
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEqual(
+            response.json(),
+            []
+        )
