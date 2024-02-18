@@ -2,6 +2,7 @@ from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
 
 def create_schedule_set(habit_item):
+    # Перед созданием проверяем наличие периодичности
     interval_item = IntervalSchedule.objects.filter(
         every=habit_item.frequency_in_days,
         period=IntervalSchedule.DAYS
@@ -9,6 +10,7 @@ def create_schedule_set(habit_item):
     if interval_item:
         schedule = interval_item
     else:
+        # Если периодичность не найдена, создаем новую
         schedule, created = IntervalSchedule.objects.get_or_create(
             every=habit_item.frequency_in_days,
             period=IntervalSchedule.DAYS
