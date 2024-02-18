@@ -531,3 +531,24 @@ class HabitTestCase(APITestCase):
             response.json(),
             []
         )
+
+    def test_delete_habit(self):
+        self.habit = Habit.objects.create(
+            user=self.user,
+            place=self.place,
+            time='10:00:00',
+            action='Слушать музыку',
+            sign_pleasant_habit=True,
+            frequency_in_days=1,
+            time_to_complete='00:01:00',
+            is_public=False
+        )
+
+        response = self.client.delete(
+            reverse('habit:habit-delete', kwargs={'pk': self.habit.pk})
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_204_NO_CONTENT
+        )
