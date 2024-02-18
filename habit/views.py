@@ -12,12 +12,14 @@ from habit.services import create_schedule_set
 
 
 class PlaceCreateView(CreateAPIView):
+    """Представления для создания экземпляра модели Place"""
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
     permission_classes = [IsAuthenticated]
 
 
 class HabitCreateView(CreateAPIView):
+    """Представление для создания экземпляра модели Habit"""
     queryset = Habit.objects.all()
     serializer_class = HabitCreateSerializer
     permission_classes = [IsAuthenticated]
@@ -30,18 +32,21 @@ class HabitCreateView(CreateAPIView):
 
 
 class HabitUpdateView(UpdateAPIView):
+    """Представление для обновления экземпляра модели Habit"""
     queryset = Habit.objects.all()
     serializer_class = HabitUpdateSerializer
     permission_classes = [IsAuthenticated, IsOwner]
 
 
 class HabitDeleteView(DestroyAPIView):
+    """Представление для удаления экземпляра модели Habit"""
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
     permission_classes = [IsAuthenticated, IsOwner]
 
 
 class ListUserHabitView(ListAPIView):
+    """Представление для вывода привычек конкретного пользователя"""
     serializer_class = HabitSerializer
     pagination_class = HabitPaginator
     permission_classes = [IsAuthenticated]
@@ -51,6 +56,7 @@ class ListUserHabitView(ListAPIView):
 
 
 class ListPublicHabit(ListAPIView):
+    """Представление для вывода публичный привычек"""
     serializer_class = HabitSerializer
     permission_classes = [IsAuthenticated]
 
