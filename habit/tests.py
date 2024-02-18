@@ -52,6 +52,57 @@ class HabitTestCase(APITestCase):
             "test_place"
         )
 
+    def test_create_habit_with_invalid_data(self):
+        """Тест на создание привычки с невалидными данными"""
+
+        data_with_invalid_frequency = {
+            'place': self.place.pk,
+            'time': '10:00:00',
+            'action': 'Слушать музыку',
+            'sign_pleasant_habit': True,
+            'frequency_in_days': 14,
+            'time_to_complete': '00:00:50'
+        }
+
+        data_with_invalid_time_to_complete = {
+            'place': self.place.pk,
+            'time': '10:00:00',
+            'action': 'Слушать музыку',
+            'sign_pleasant_habit': True,
+            'frequency_in_days': 2,
+            'time_to_complete': '05:00:00'
+        }
+
+        first_response = self.client.post(
+            reverse('habit:habit-create'),
+            data=data_with_invalid_frequency
+        )
+
+        self.assertEqual(
+            first_response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
+
+        self.assertEqual(
+            first_response.json(),
+            {'frequency_in_days': ['Периодичность должна быть больше нуля и меньше или равна 7!']}
+        )
+
+        second_response = self.client.post(
+            reverse('habit:habit-create'),
+            data=data_with_invalid_time_to_complete
+        )
+
+        self.assertEqual(
+            second_response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
+
+        self.assertEqual(
+            second_response.json(),
+            {'time_to_complete': ['Продолжительность выполнения не может быть больше 2 минут!']}
+        )
+
     def test_nice_habit_create(self):
         """Тест на создание приятной привычки"""
 
@@ -275,7 +326,7 @@ class HabitTestCase(APITestCase):
         )
 
     def test_incorrect_update_habit(self):
-        """Тест на некорректное обновление привычки"""
+        """Тест на некорректное обновление приятной привычки"""
         self.habit = Habit.objects.create(
             user=self.user,
             place=self.place,
@@ -358,43 +409,79 @@ class HabitTestCase(APITestCase):
             'Купить пирожное'
         )
 
-    # def test_incorrect_update_useful_habit(self):
-    #     """Тест на некорректное обновление полезной привычки"""
-    #     self.useful_habit = Habit.objects.create(
-    #         user=self.user,
-    #         place=self.place,
-    #         time='10:00:00',
-    #         action='Бег в 10:00',
-    #         sign_pleasant_habit=False,
-    #         frequency_in_days=2,
-    #         time_to_complete='00:01:00',
-    #         reward='Смотреть сериал 1 час',
-    #
-    #     )
-    #
-    #     self.nice_habit = Habit.objects.create(
-    #         user=self.user,
-    #         place=self.place,
-    #         time='10:00:00',
-    #         action='Слушать музыку',
-    #         sign_pleasant_habit=True,
-    #         frequency_in_days=1,
-    #         time_to_complete='00:01:00'
-    #     )
-    #
-    #     data = {'associated_habit': self.nice_habit.pk}
-    #
-    #     response = self.client.patch(
-    #         reverse('habit:habit-update', kwargs={'pk': self.useful_habit.pk}),
-    #         data=data
-    #     )
-    #
-    #     self.assertEqual(
-    #         response.status_code,
-    #         status.HTTP_400_BAD_REQUEST
-    #     )
-    #
-    #     self.assertEqual(
-    #         response.json().get(''),
-    #         ['Если указана награда, награду указывать нельзя!']
-    #     )
+    def test_update_useful_habit_with_reward(self):
+        """Тест на некорректное обновление полезной привычки с наградой"""
+        self.useful_habit = Habit.objects.create(
+            user=self.user,
+            place=self.place,
+            time='10:00:00',
+            action='Бег в 10:00',
+            sign_pleasant_habit=False,
+            frequency_in_days=2,
+            time_to_complete='00:01:00',
+            reward='Смотреть сериал 1 час',
+
+        )
+
+        self.nice_habit = Habit.objects.create(
+            user=self.user,
+            place=self.place,
+            time='10:00:00',
+            action='Слушать музыку',
+            sign_pleasant_habit=True,
+            frequency_in_days=1,
+            time_to_complete='00:01:00'
+        )
+
+        data = {'associated_habit': self.nice_habit.pk}
+
+        response = self.client.patch(
+            reverse('habit:habit-update', kwargs={'pk': self.useful_habit.pk}),
+            data=data
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
+
+        self.assertEqual(
+            response.json(),
+            ['Нельзя указывать награду и связанную привычку одновременно!']
+        )
+
+    def test_update_useful_habit_with_associated_habit(self):
+        """Тест на некорректное обновление полезной привычки со связанной привычкой"""
+        self.nice_habit = Habit.objects.create(
+            user=self.user,
+            place=self.place,
+            time='10:00:00',
+            action='Слушать музыку',
+            sign_pleasant_habit=True,
+            frequency_in_days=1,
+            time_to_complete='00:01:00'
+        )
+
+        self.useful_habit = Habit.objects.create(
+            user=self.user,
+            place=self.place,
+            time='10:00:00',
+            action='Бег в 10:00',
+            sign_pleasant_habit=False,
+            frequency_in_days=2,
+            time_to_complete='00:01:00',
+            associated_habit=self.nice_habit
+
+        )
+
+        data = {'reward': 'Смотреть сериал 1 час'}
+
+        response = self.client.patch(
+            reverse('habit:habit-update', kwargs={'pk': self.useful_habit.pk}),
+            data=data
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )

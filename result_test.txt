@@ -18,14 +18,14 @@ habit/migrations/0006_alter_habit_associated_habit.py                           
 habit/migrations/__init__.py                                                           0      0   100%
 habit/models.py                                                                       26      2    92%
 habit/paginators.py                                                                    5      0   100%
-habit/permissions.py                                                                   4      1    75%
-habit/serializers.py                                                                  54     19    65%
-habit/services.py                                                                      4      0   100%
+habit/permissions.py                                                                   4      0   100%
+habit/serializers.py                                                                  62      1    98%
+habit/services.py                                                                      7      5    29%
 habit/tasks.py                                                                         9      9     0%
-habit/tests.py                                                                        48      0   100%
+habit/tests.py                                                                        98      0   100%
 habit/urls.py                                                                          5      0   100%
-habit/validators.py                                                                   11      2    82%
-habit/views.py                                                                        39      2    95%
+habit/validators.py                                                                   11      0   100%
+habit/views.py                                                                        38      2    95%
 manage.py                                                                             12      2    83%
 users/__init__.py                                                                      0      0   100%
 users/admin.py                                                                         1      0   100%
@@ -42,4 +42,4 @@ users/tests.py                                                                  
 users/urls.py                                                                          6      0   100%
 users/views.py                                                                        13      0   100%
 ------------------------------------------------------------------------------------------------------
-TOTAL                                                                                385     52    86%
+TOTAL                                                                                445     36    92%
