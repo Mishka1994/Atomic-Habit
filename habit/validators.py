@@ -3,7 +3,7 @@ import datetime
 from rest_framework import serializers
 
 
-class FrequencyHabitExecution:
+class FrequencyHabit:
 
     def __call__(self, value):
         if value <= 0 or value > 7:

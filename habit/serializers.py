@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from habit.models import Place, Habit
-from habit.validators import FrequencyHabitExecution, DurationHabit
+from habit.validators import DurationHabit, FrequencyHabit
 
 
 class PlaceSerializer(serializers.ModelSerializer):
@@ -17,7 +17,7 @@ class HabitSerializer(serializers.ModelSerializer):
 
 
 class HabitCreateSerializer(serializers.ModelSerializer):
-    frequency_in_days = serializers.IntegerField(validators=[FrequencyHabitExecution(), ])
+    frequency_in_days = serializers.IntegerField(validators=[FrequencyHabit(), ])
     time_to_complete = serializers.TimeField(validators=[DurationHabit(), ])
 
     class Meta:
@@ -29,10 +29,14 @@ class HabitCreateSerializer(serializers.ModelSerializer):
         if validated_data['sign_pleasant_habit']:
             # Проверка на наличие связанной привычки у приятной привычки
             if validated_data.get('associated_habit') is not None:
-                raise serializers.ValidationError('У приятной привычки не может быть связанной привычки!')
+                raise serializers.ValidationError(
+                    'У приятной привычки не может быть связанной привычки!'
+                )
             # Проверка на наличие награды у приятной привычки
             elif validated_data.get('reward'):
-                raise serializers.ValidationError('У приятной привычки нельзя указывать награду!')
+                raise serializers.ValidationError(
+                    'У приятной привычки нельзя указывать награду!'
+                )
 
         # Валидация полезной привычки
         elif not validated_data['sign_pleasant_habit']:
@@ -51,7 +55,7 @@ class HabitCreateSerializer(serializers.ModelSerializer):
 
 
 class HabitUpdateSerializer(serializers.ModelSerializer):
-    frequency_in_days = serializers.IntegerField(validators=[FrequencyHabitExecution(), ])
+    frequency_in_days = serializers.IntegerField(validators=[FrequencyHabit(),])
     time_to_complete = serializers.TimeField(validators=[DurationHabit(), ])
 
     class Meta:
@@ -59,14 +63,26 @@ class HabitUpdateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def update(self, instance, validated_data):
+        # Валидация приятной привычки
         if instance.sign_pleasant_habit:
+            # Проверка на добавление награды
             if validated_data.get('reward'):
                 raise serializers.ValidationError('У приятной привычки нельзя указывать награду!')
+            # Проверка на добавление связанной привычки
             elif validated_data.get('associated_habit'):
                 raise serializers.ValidationError('У приятной привычки не может быть связанной привычки!')
-        elif not instance.sign_pleasant_habit and validated_data.get('associated_habit') is not None:
-            if validated_data.get('reward'):
-                raise serializers.ValidationError('Если указана связанная привычка, награду указывать нельзя!')
+        # Валидация полезной привычки
+        elif not instance.sign_pleasant_habit:
+            # Проверка добавляемой связанной привычки(можно добавить только приятную привычку)
+            if validated_data.get('associated_habit'):
+                associated_habit = validated_data['associated_habit']
+                if not associated_habit.sign_pleasant_habit:
+                    raise serializers.ValidationError('В связанные привычки можно указывать только приятные привычки!')
+            # Проверка на добавление награды, если есть связанная привычка и
+            # на добавление связанной привычки если есть награда
+            if (validated_data.get('reward') and instance.associated_habit is not None) or \
+                    validated_data.get('associated_habit') and instance.reward != 'Нет награды!':
+                raise serializers.ValidationError('Нельзя указывать награду и связанную привычку одновременно!')
 
         instance.place = validated_data.get('place', instance.place)
         instance.user = validated_data.get('user', instance.user)
